@@ -66,3 +66,21 @@ Episodio CriarEp(Podcast podcast) {
 	novoep->numero = NumeroTemp;
 }
 
+//Criar podcast
+Podcast CriarPodcast() {
+	Podcast podcast = malloc(sizeof(Podcast));
+	podcast->inicio = NULL;
+	podcast->fim = NULL;
+
+	char NomeTemp[64];
+	Printf("Qual o nome do Podcast?\n");
+	scanf_s("%s", &NomeTemp);
+
+	int PassagemNome = 0;
+	while (PassagemNome > sizeof(podcast->nome)) {
+		podcast->nome[PassagemNome] = NomeTemp[PassagemNome];
+	}
+
+}
+
+

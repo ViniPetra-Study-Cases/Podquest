@@ -24,14 +24,45 @@ typedef struct playlist {
 
 typedef playlist* Playlist;
 
-
+//Podcast
 typedef struct podcast {
+	char nome[64];
 	struct Episodio* inicio;
 	struct Episodio* fim;
 }podcast;
 
 typedef podcast* Podcast;
 
+//Criar episódio
+Episodio CriarEp(Podcast podcast) {
+	Episodio novoep = malloc(sizeof(Episodio));
+	novoep->prev = NULL;
+	novoep->prox = NULL;
 
+	//Definir o id
+	novoep->id = idCount;
+	idCount++;
 
+	//Definir o nome do podcast que pertence
+	int PassagemNome = 0;
+	while (PassagemNome > sizeof(novoep->podcast)) {
+		novoep->podcast[PassagemNome] = podcast->nome[PassagemNome];
+	}
+	
+	char NomeTemp[64];
+	Printf("Qual o nome do episódio?\n");
+	scanf_s("%s", &NomeTemp);
+	PassagemNome = 0;
+	while (PassagemNome > sizeof(novoep->nome)) {
+		novoep->nome[PassagemNome] = NomeTemp[PassagemNome];
+	}
+
+	/*
+	* Criar busca para definir automaticamente
+	*/
+	Printf("Qual o numero do episódio?\n");
+	int NumeroTemp;
+	scanf_s("%d", &NumeroTemp);
+	novoep->numero = NumeroTemp;
+}
 

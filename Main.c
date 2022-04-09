@@ -4,7 +4,7 @@
 int idCount = 0;
 
 //Episódio
-typedef struct Ep {
+typedef struct Episodio {
 	int id;
 	char nome[64];
 	char podcast[64];
@@ -17,7 +17,7 @@ typedef struct Ep {
 typedef episodio* Episodio;
 
 //Playlist
-typedef struct playlist {
+typedef struct Playlist {
 	struct Episodio* inicio;
 	struct Episodio* fim;
 }playlist;
@@ -25,7 +25,7 @@ typedef struct playlist {
 typedef playlist* Playlist;
 
 //Podcast
-typedef struct podcast {
+typedef struct Podcast {
 	char nome[64];
 	struct Episodio* inicio;
 	struct Episodio* fim;
@@ -81,6 +81,22 @@ Podcast CriarPodcast() {
 		podcast->nome[PassagemNome] = NomeTemp[PassagemNome];
 	}
 
+}
+
+//Adicionar Episódio
+Podcast NovoEpisodio(Podcast podcast) {
+	
+	Episodio novoep = CriarEp(podcast);
+	
+	if (podcast->inicio == NULL) {
+		podcast->inicio = novoep;
+		podcast->fim = novoep;
+	}
+	else {
+		podcast->fim->prox = novoep;
+		novoep->prev = podcast->fim;
+		podcast->fim = novoep;
+	}
 }
 
 

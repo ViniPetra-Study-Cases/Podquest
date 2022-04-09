@@ -145,9 +145,6 @@
     <None Include="BCC_ED_EP1_Podquest.pdf" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Guide.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="Main.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

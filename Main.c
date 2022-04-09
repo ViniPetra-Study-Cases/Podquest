@@ -1,15 +1,21 @@
 #include<stdio.h>
 #include <stdlib.h>
 
+void remove_newline_ch(char* line)
+{
+	int new_line = strlen(line) - 1;
+	if (line[new_line] == '\n')
+		line[new_line] = '\0';
+}
+
 int idCount = 0;
 
 //Episódio
 typedef struct Episodio {
-	int id;
 	char nome[64];
 	char podcast[64];
 	int numero;
-	//Definir a lista de palavras chave
+	struct PalavrasChave* palavraschave;
 	struct Episodio* prox;
 	struct Episodio* prev;
 }episodio;
@@ -26,6 +32,7 @@ typedef playlist* Playlist;
 
 //Podcast
 typedef struct Podcast {
+	int id;
 	char nome[64];
 	struct Episodio* inicio;
 	struct Episodio* fim;
@@ -33,54 +40,62 @@ typedef struct Podcast {
 
 typedef podcast* Podcast;
 
+//Palavras-Chave
+typedef struct PalavrasChave {
+	char palavra[64];
+	struct PalavrasChave* prox;
+}palavraschave;
+
+typedef palavraschave* PalavrasChave;
+
+typedef struct ListaPalavrasChave {
+	struct PalavrasChave* inicio;
+	struct PalavrasChave* fim;
+}listapalavraschave;
+
+typedef listapalavraschave* ListaPalavrasChave;
+
 //Criar episódio
 Episodio CriarEp(Podcast podcast) {
 	Episodio novoep = malloc(sizeof(Episodio));
 	novoep->prev = NULL;
 	novoep->prox = NULL;
 
-	//Definir o id
-	novoep->id = idCount;
-	idCount++;
-
-	//Definir o nome do podcast que pertence
-	int PassagemNome = 0;
-	while (PassagemNome > sizeof(novoep->podcast)) {
-		novoep->podcast[PassagemNome] = podcast->nome[PassagemNome];
-	}
-	
-	char NomeTemp[64];
-	Printf("Qual o nome do episódio?\n");
-	scanf_s("%s", &NomeTemp);
-	PassagemNome = 0;
-	while (PassagemNome > sizeof(novoep->nome)) {
-		novoep->nome[PassagemNome] = NomeTemp[PassagemNome];
-	}
+	printf("Qual o nome do episódio?\n");
+	fgets(novoep->nome, 64, stdin);
+	remove_newline_ch(novoep->nome);
 
 	/*
 	* Criar busca para definir automaticamente
 	*/
-	Printf("Qual o numero do episódio?\n");
+	printf("Qual o numero do episódio?\n");
 	int NumeroTemp;
 	scanf_s("%d", &NumeroTemp);
+	getchar();
 	novoep->numero = NumeroTemp;
+
+
+	//Idendificador do podcast
+	int PassagemNome = 0;
+	while (PassagemNome > sizeof(podcast->nome)) {
+		novoep->podcast[PassagemNome] = podcast->nome[PassagemNome];
+	}
+	//Palavras chave
 }
 
 //Criar podcast
 Podcast CriarPodcast() {
 	Podcast podcast = malloc(sizeof(Podcast));
 	podcast->inicio = NULL;
-	podcast->fim = NULL;
+	podcast->fim = NULL;	
+	
+	//Definir o id
+	podcast->id = idCount;
+	idCount++;
 
-	char NomeTemp[64];
-	Printf("Qual o nome do Podcast?\n");
-	scanf_s("%s", &NomeTemp);
-
-	int PassagemNome = 0;
-	while (PassagemNome > sizeof(podcast->nome)) {
-		podcast->nome[PassagemNome] = NomeTemp[PassagemNome];
-	}
-
+	printf("Qual o nome do Podcast?\n");
+	fgets(podcast->nome, 64, stdin);
+	remove_newline_ch(podcast->nome);
 }
 
 //Adicionar Episódio
@@ -99,4 +114,13 @@ Podcast NovoEpisodio(Podcast podcast) {
 	}
 }
 
+Podcast RemoverEpisodio(Podcast podcast) {
 
+}
+
+
+void main(void) {
+	Podcast podcast = CriarPodcast();
+	NovoEpisodio(podcast);
+	NovoEpisodio(podcast);
+}

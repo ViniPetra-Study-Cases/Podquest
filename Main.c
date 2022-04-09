@@ -81,6 +81,7 @@ Episodio CriarEp(Podcast podcast) {
 		novoep->podcast[PassagemNome] = podcast->nome[PassagemNome];
 	}
 	//Palavras chave
+	return novoep;
 }
 
 //Criar podcast
@@ -96,6 +97,7 @@ Podcast CriarPodcast() {
 	printf("Qual o nome do Podcast?\n");
 	fgets(podcast->nome, 64, stdin);
 	remove_newline_ch(podcast->nome);
+	return podcast;
 }
 
 //Adicionar Episódio
@@ -112,6 +114,7 @@ Podcast NovoEpisodio(Podcast podcast) {
 		novoep->prev = podcast->fim;
 		podcast->fim = novoep;
 	}
+	return novoep;
 }
 
 Podcast RemoverEpisodio(Podcast podcast) {

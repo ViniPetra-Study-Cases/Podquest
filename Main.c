@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 void remove_newline_ch(char* line)
 {
@@ -360,7 +361,8 @@ void main(void) {
 	int opc;
 	int pdcopc;
 	int epopc;
-	printf("Bem-vindo!\nEscolha uma das opções abaixo:\n1 - Criar um novo podcast\n2 - Adicionar um episódio ao seu podcast\n3 - Remover um episódio ao seu podcast\n4 - Listar todos os episódios do seu Podcast\n5 - Adicionar episódios à sua playlist\n6 - Remover episódios da sua playlist\n7 - Tocar um episódio\n 8 - Qual episódio estou ouvindo?\n");
+	bool shuffle = false;
+	printf("Bem-vindo!\nEscolha uma das opções abaixo:\n1 - Criar um novo podcast\n2 - Adicionar um episódio ao seu podcast\n3 - Remover um episódio ao seu podcast\n4 - Listar todos os episódios do seu Podcast\n5 - Adicionar episódios à sua playlist\n6 - Remover episódios da sua playlist\n7 - Tocar um episódio\n8 - Qual episódio estou ouvindo?\n9 - Adicionar ep atual à playlist\n10 - Tocar minha playlist\n11 - Tocar próximo da minha playlist\n12 - Ativar o modo aleatório na minha playlist\n");
 	scanf_s("%d", &opc);
 	switch (opc) {
 		case 1:
@@ -434,28 +436,69 @@ void main(void) {
 			printf("Qual o numero do episódio que você deseja ouvir?\n");
 			scanf_s("%d", &epopc);
 			EpisodioAtual = EscolherEpisodio(podcastEscolhido, epopc);
-			printf("Você está ouvindo %d %s do podcast %s", EpisodioAtual->numero, EpisodioAtual->nome, EpisodioAtual->podcast->nome);
+			printf("Você está ouvindo %d %s do podcast %s\n", EpisodioAtual->numero, EpisodioAtual->nome, EpisodioAtual->podcast->nome);
 			break;
-		case 9:
+		case 8:
 			if (EpisodioAtual == NULL) {
-				printf("Você não está ouvindo nenhum episódio");
+				printf("Você não está ouvindo nenhum episódio\n");
 				break;
 			}
 			else {
-				printf("Você está ouvindo %d %s do podcast %s", EpisodioAtual->numero, EpisodioAtual->nome, EpisodioAtual->podcast->nome);
+				printf("Você está ouvindo %d %s do podcast %s\n", EpisodioAtual->numero, EpisodioAtual->nome, EpisodioAtual->podcast->nome);
 				break;
 			}
 			break;
-		case 10:
+		case 9:
 			if (EpisodioAtual == NULL) {
-				printf("Você não está ouvindo nenhum episódio");
+				printf("Você não está ouvindo nenhum episódio\n");
 				break;
 			}
 			else {
 				AdicionarEp(playlist, EpisodioAtual);
-				printf("Episódio adicionado à sua playlist");
+				printf("Episódio adicionado à sua playlist\n");
 				break;
 			}
-			
+		case 10:
+			if (playlist->inicio != NULL) {
+				EpisodioAtual = playlist->inicio;
+				printf("Você está ouvindo %d %s do podcast %s\n", EpisodioAtual->numero, EpisodioAtual->nome, EpisodioAtual->podcast->nome);
+				break;
+			}
+			else {
+				printf("Playlist vazia");
+				break;
+			}
+		case 11:
+			if (shuffle == true) {
+				if (playlist->inicio != NULL) {
+
+					srand(time(NULL));
+					int aux = rand() % sizeof(playlist) + 1;
+					int count = 0;
+					while (count != aux) {
+						EpisodioAtual = EpisodioAtual->prox;
+					}
+					printf("Você está ouvindo %d %s do podcast %s\n", EpisodioAtual->numero, EpisodioAtual->nome, EpisodioAtual->podcast->nome);
+				}
+				else {
+					printf("Playlist vazia");
+					break;
+				}
+			}
+			else {
+				if (EpisodioAtual->prox != NULL) {
+					EpisodioAtual = EpisodioAtual->prox;
+					printf("Você está ouvindo %d %s do podcast %s\n", EpisodioAtual->numero, EpisodioAtual->nome, EpisodioAtual->podcast->nome);
+					break;
+				}
+				else {
+					printf("não há mais episódios na sua playlist\n");
+					break;
+				}
+			}
+		case 12:
+			shuffle = true;
+			printf("Ateatório ativado!\n");
+			break;
 	}
 }

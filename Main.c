@@ -25,13 +25,13 @@ typedef struct Episodio {
 typedef episodio* Episodio;
 
 //Podcast
-typedef struct Podcast {
+typedef struct PodCast {
 	int id;
 	char nome[64];
 	struct Episodio* inicio;
 	struct Episodio* fim;
-	struct Podcast* prev;
-	struct Podcast* prox;
+	struct PodCast* prev;
+	struct PodCast* prox;
 }podcast;
 
 typedef podcast* Podcast;
@@ -55,9 +55,9 @@ typedef playlist* Playlist;
 //Cabeça da playlist
 
 //Palavras-Chave
-typedef struct PalavrasChave {
+typedef struct Palavraschave {
 	char palavra[64];
-	struct PalavrasChave* prox;
+	struct Palavraschave* prox;
 }palavraschave;
 
 typedef palavraschave* PalavrasChave;
@@ -162,6 +162,18 @@ Episodio CriarEpVazio() {
 	return episodio;
 }
 
+//Criar podcast vazio
+Podcast CriarPodcastVazio() {
+	Podcast podcast = malloc(sizeof(Podcast));
+	podcast->fim = NULL;
+	podcast->inicio = NULL;
+	podcast->prev = NULL;
+	podcast->prox = NULL;
+	podcast->id = NULL;
+	strcpy(podcast->nome, NULL);
+	return podcast;
+}
+
 //Palavras - chave
 PalavrasChave AdicionarPalavras(Episodio ep) {
 	if (ep->palavraschave == NULL) {
@@ -173,39 +185,61 @@ PalavrasChave AdicionarPalavras(Episodio ep) {
 
 		palavra->prox = NULL;
 	}
-	else {
-		PalavrasChave aux = malloc(sizeof(PalavrasChave));
-		aux->palavra = NULL;
-		aux->prox = NULL;
+	
+	PalavrasChave aux = malloc(sizeof(PalavrasChave));
+	strcpy(aux->palavra, NULL); //Erro de lvalue 
+	aux->prox = NULL;
 
-		aux = ep->palavraschave;
+	aux = ep->palavraschave;
 
-		while (aux->prox != NULL) {
-			aux = aux->prox;
-		}
-
-		PalavrasChave palavra = malloc(sizeof(PalavrasChave));
-		printf("Digite a palavra-chave:\n");
-		fgets(palavra->palavra, 64, stdin);
-		remove_newline_ch(palavra->palavra);
-		aux->prox = palavra;
+	while (aux->prox != NULL) {
+		aux = aux->prox;
 	}
-}
 
-/*
-Episodio ApagarEp(Episodio episodio, int id) {
-
-	Episodio aux = malloc(sizeof(Episodio));
-	for (Episodio aux = episodio->podcast->inicio; aux->podcast->id == id; aux = aux->prox)
-	{
-		//Remover
-	}
-	printf("\n");
+	PalavrasChave palavra = malloc(sizeof(PalavrasChave));
+	printf("Digite a palavra-chave:\n");
+	fgets(palavra->palavra, 64, stdin);
+	remove_newline_ch(palavra->palavra);
+	aux->prox = palavra;
 }
-*/
 
 Podcast RemoverEpisodio(Podcast podcast) {
+	if (PrintarEpisodios(podcast) == 0) {
+		return;
+	}
+	else {
+		Episodio epAux = CriarEpVazio();
+		epAux = podcast->inicio;
 
+		int opc;
+		printf("\nQual o número do podcast que deseja remover?\n");
+		scanf_s("%d", &opc);
+
+		epAux = epAux = podcast->inicio;
+		while (epAux->numero != opc) {
+			epAux = epAux->prox;
+		}
+
+		epAux->prev->prox = epAux->prox;
+		epAux->prox->prev = epAux->prev;
+	}
+}
+
+Episodio PrintarEpisodios(Podcast podcast) {
+	if (podcast->inicio == NULL) {
+		printf("Não há nenhum episódio neste podcast\n");
+		return 0;
+	}
+	else {
+		Episodio epAux = CriarEpVazio();
+		epAux = podcast->inicio;
+
+		while (epAux->prox != NULL) {
+			printf("%d %s\n", epAux->numero, epAux->nome);
+			epAux = epAux->prox;
+		}
+		return 1;
+	}
 }
 
 Playlist CriarPlaylist() {
@@ -241,7 +275,7 @@ Playlist RemoverEp(){
 }
 
 void main(void) {
-
+	PalavrasChave palavra = malloc(sizeof(PalavrasChave));
 	int opc;
 	printf("Bem-vindo!\nEscolha uma das opções abaixo:\n1 - Criar um novo podcast\n2 - Adicionar um episódio ao seu podcast\n3 - Remover um episódio ao seu podcast\n4 - Listar todos os episódios do seu Podcast\n5 - Adicionar episódios à sua playlist\n");
 	

@@ -16,7 +16,7 @@ Episodio episodios[50];
 typedef struct Episodio {
 	char nome[64];
 	int numero;
-	struct Podcast* podcast;
+	struct PodCast* podcast;
 	struct PalavrasChave* palavraschave;
 	struct Episodio* prox;
 	struct Episodio* prev;
@@ -38,21 +38,19 @@ typedef podcast* Podcast;
 
 //Cabeça do podcast
 typedef struct PodcastHead {
-	struct Podcast* inicio;
-	struct Podcast* fim;
+	struct PodCast* inicio;
+	struct PodCast* fim;
 }podcasthead;
 
 typedef podcasthead* PodcastHead;
 
 //Playlist
 typedef struct Playlist {
-	struct Episodio* ep;
 	struct Episodio* inicio;
+	struct Episodio* fim;
 }playlist;
 
 typedef playlist* Playlist;
-
-//Cabeça da playlist
 
 //Palavras-Chave
 typedef struct Palavraschave {
@@ -62,13 +60,6 @@ typedef struct Palavraschave {
 
 typedef palavraschave* PalavrasChave;
 
-//Criar PodcastHead
-typedef struct PodcastHead {
-	Podcast* inicio;
-	Podcast* fim;
-}podcasthead;
-
-typedef podcasthead* PodcastHead;
 
 //Criar PodcastHead
 PodcastHead CriarCabeçaPodcast() {
@@ -98,11 +89,8 @@ Podcast CriarPodcast() {
 
 //Criar episódio
 Episodio CriarNovoEpisódio(Podcast podcast) {
-	/*
-	* 1 - perguntar qual podcast pertence
-	* 1.1 - printar podcasts e usar o valor como numero de repetições
-	* 1.1.1 - criar funções buscar(podcast) e buscar(podcast, index)
-	*/
+
+	int contagem = 0;
 
 	Episodio novoep = malloc(sizeof(Episodio));
 	
@@ -122,14 +110,16 @@ Episodio CriarNovoEpisódio(Podcast podcast) {
 	fgets(novoep->nome, 64, stdin);
 	remove_newline_ch(novoep->nome);
 
-	/*
-	* Criar busca para definir automaticamente
-	*/
-	printf("Qual o numero do episódio?\n");
-	int NumeroTemp;
-	scanf_s("%d", &NumeroTemp);
-	getchar();
-	novoep->numero = NumeroTemp;
+	//Numero
+	Episodio epAux = CriarEpVazio();
+	epAux = podcast->inicio;
+
+	while (epAux->prox != NULL) {
+		contagem++;
+		epAux = epAux->prox;
+	}
+
+	novoep->numero = contagem;
 
 	//Idendificador do podcast
 	novoep->podcast = podcast;
@@ -242,41 +232,230 @@ Episodio PrintarEpisodios(Podcast podcast) {
 	}
 }
 
+Episodio PrintarEpisodios(Playlist playlist) {
+	if (playlist->inicio == NULL) {
+		printf("Não há nenhum episódio nesta playlist\n");
+		return 0;
+	}
+	else {
+		Episodio epAux = CriarEpVazio();
+		epAux = playlist->inicio;
+
+		while (epAux->prox != NULL) {
+			printf("%d %s\n", epAux->numero, epAux->nome);
+			epAux = epAux->prox;
+		}
+		return 1;
+	}
+}
+
+Podcast PrintarPodcasts(PodcastHead podcasthead) {
+	if (podcasthead->inicio == NULL) {
+		printf("Não há nenhum podcast cadastrado\n");
+		return 0;
+	}
+	else {
+		Podcast podcastAux = CriarpodcastVazio();
+		podcastAux = podcasthead->inicio;
+
+		while (podcastAux->prox != NULL) {
+			printf("%d %s\n", podcastAux->id, podcastAux->nome);
+			podcastAux = podcastAux->prox;
+		}
+		return 1;
+	}
+}
+
 Playlist CriarPlaylist() {
 	Playlist playlist = malloc(sizeof(Playlist));
-	playlist->ep = NULL;
 	playlist->inicio = NULL;
+	playlist->fim = NULL;
 	return playlist;
 }
 
-//Imprimir a playlist
-Playlist PrintarPlaylist(Playlist playlist) {
-	
-	if (playlist->inicio == NULL) {
-		printf("Playlist vazia\n");
+
+Podcast EscolherPodcast(int id, PodcastHead podcasthead) {
+
+	Podcast podcastEscolhido = CriarPodcastVazio();
+	Podcast podcastAux = CriarPodcastVazio;
+
+	podcastAux = podcasthead->inicio;
+
+	while (podcastAux->id != id) {
+		podcastAux = podcastAux->prox;
+	}
+
+	if (podcastAux == NULL && podcastAux->id != id) {
+		printf("Podcast não encontrado\n");
 		return;
 	}
-
-	Episodio aux = malloc(sizeof(Episodio));
-
-	for (Episodio aux = playlist->inicio; aux != NULL; aux = aux->prox)
-	{
-		printf("%d\n ", aux->nome);
+	else {
+		podcastEscolhido = podcastAux;
 	}
-	printf("\n");
+
+	return podcastEscolhido;
 }
 
-Playlist AdicionarEp() {
+Playlist AdicionarEp(Playlist playlist, Episodio episodio) {
+	if (playlist->inicio == NULL) {
+		playlist->inicio = episodio;
+		playlist->fim = episodio;
+	}
+	else {
+		playlist->fim->prox = episodio;
+		episodio->prev = playlist->fim;
+		playlist->fim = episodio;
 
+	}
 }
 
-Playlist RemoverEp(){
+Playlist RemoverEp(Playlist playlist, int numero){
+	if (PrintarEpisodios(playlist) == 0) {
+		return;
+	}
+	else {
+		Episodio epAux = CriarEpVazio();
+		epAux = playlist->inicio;
 
+		int opc;
+		printf("\nQual o número do episódio que deseja remover?\n");
+		scanf_s("%d", &opc);
+
+		epAux = epAux = playlist->inicio;
+		while (epAux->numero != opc) {
+			epAux = epAux->prox;
+		}
+
+		epAux->prev->prox = epAux->prox;
+		epAux->prox->prev = epAux->prev;
+	}
+}
+
+Episodio EscolherEpisodio(Podcast podcast, int numero) {
+	Episodio episodioEscolhido = CriarEpVazio();
+	Episodio epAux = CriarEpVazio();
+
+	epAux = podcast->inicio;
+
+	while (epAux->numero != numero) {
+		epAux = epAux->prox;
+	}
+
+	if (epAux == NULL && epAux->numero != numero) {
+		printf("Episódio não encontrado\n");
+		return;
+	}
+	else {
+		episodioEscolhido = epAux;
+	}
+
+	return episodioEscolhido;
 }
 
 void main(void) {
-	PalavrasChave palavra = malloc(sizeof(PalavrasChave));
+	Episodio EpisodioAtual = CriarEpVazio();
+	Playlist playlist = CriarPlaylist();
+	PodcastHead podcasthead = CriarCabeçaPodcast();
+
 	int opc;
-	printf("Bem-vindo!\nEscolha uma das opções abaixo:\n1 - Criar um novo podcast\n2 - Adicionar um episódio ao seu podcast\n3 - Remover um episódio ao seu podcast\n4 - Listar todos os episódios do seu Podcast\n5 - Adicionar episódios à sua playlist\n");
-	
+	int pdcopc;
+	int epopc;
+	printf("Bem-vindo!\nEscolha uma das opções abaixo:\n1 - Criar um novo podcast\n2 - Adicionar um episódio ao seu podcast\n3 - Remover um episódio ao seu podcast\n4 - Listar todos os episódios do seu Podcast\n5 - Adicionar episódios à sua playlist\n6 - Remover episódios da sua playlist\n7 - Tocar um episódio\n 8 - Qual episódio estou ouvindo?\n");
+	scanf_s("%d", &opc);
+	switch (opc) {
+		case 1:
+			if (podcasthead->inicio == NULL) {
+				Podcast podcast = CriarPodcast();
+				podcasthead->inicio = podcast;
+				podcasthead->fim = podcast;
+			}
+			else {
+				Podcast podcast = CriarPodcast();
+				podcasthead->fim->prox = podcast;
+				podcast->prev = podcasthead->fim;
+				podcasthead->fim = podcast;
+			}
+			break;
+		case 2:
+			PrintarPodcasts(podcasthead);
+			printf("Qual o id do podcast que você deseja adicionar um Episódio?\n");
+			scanf_s("%d", &pdcopc);
+			
+			Podcast podcastEscolhido = EscolherPodcast(pdcopc, podcasthead);
+
+			CriarNovoEpisódio(podcastEscolhido);
+
+			break;
+		case 3:
+			PrintarPodcasts(podcasthead);
+			printf("Qual o id do podcast que você deseja remover um Episódio?\n");
+			scanf_s("%d", &pdcopc);
+
+			Podcast podcastEscolhido = EscolherPodcast(pdcopc, podcasthead);
+			
+			RemoverEpisodio(podcastEscolhido);
+
+			break;
+		case 4:
+			PrintarPodcasts(podcasthead);
+			printf("Qual o id do podcast que você deseja listar os Episódios?\n");
+			scanf_s("%d", &pdcopc);
+
+			Podcast podcastEscolhido = EscolherPodcast(pdcopc, podcasthead);
+
+			PrintarEpisodios(podcastEscolhido);
+			break;
+		case 5:
+			PrintarPodcasts(podcasthead);
+			printf("Qual o id do podcast que você deseja listar os Episódios?\n");
+			scanf_s("%d", &pdcopc);
+			Podcast podcastEscolhido = EscolherPodcast(pdcopc, podcasthead);
+			PrintarEpisodios(podcastEscolhido);
+			printf("Qual o numero do episódio que você deseja adicionar à playlist?\n");
+			scanf_s("%d", &epopc);
+			AdicionarEp(playlist, epopc);
+			break;
+		case 6:
+			PrintarPodcasts(podcasthead);
+			printf("Qual o id do podcast que você deseja listar os Episódios?\n");
+			scanf_s("%d", &pdcopc);
+			Podcast podcastEscolhido = EscolherPodcast(pdcopc, podcasthead);
+			PrintarEpisodios(podcastEscolhido);
+			printf("Qual o numero do episódio que você deseja remover da playlist?\n");
+			scanf_s("%d", &epopc);
+			removerEp(playlist, epopc);
+			break;
+		case 7:
+			PrintarPodcasts(podcasthead);
+			printf("Qual o id do podcast que você deseja listar os Episódios?\n");
+			scanf_s("%d", &pdcopc);
+			Podcast podcastEscolhido = EscolherPodcast(pdcopc, podcasthead);
+			PrintarEpisodios(podcastEscolhido);
+			printf("Qual o numero do episódio que você deseja ouvir?\n");
+			scanf_s("%d", &epopc);
+			EpisodioAtual = EscolherEpisodio(podcastEscolhido, epopc);
+			printf("Você está ouvindo %d %s do podcast %s", EpisodioAtual->numero, EpisodioAtual->nome, EpisodioAtual->podcast->nome);
+			break;
+		case 9:
+			if (EpisodioAtual == NULL) {
+				printf("Você não está ouvindo nenhum episódio");
+				break;
+			}
+			else {
+				printf("Você está ouvindo %d %s do podcast %s", EpisodioAtual->numero, EpisodioAtual->nome, EpisodioAtual->podcast->nome);
+				break;
+			}
+			break;
+		case 10:
+			if (EpisodioAtual == NULL) {
+				printf("Você não está ouvindo nenhum episódio");
+				break;
+			}
+			else {
+				AdicionarEp(playlist, EpisodioAtual);
+				printf("Episódio adicionado à sua playlist");
+				break;
+			}
+			
+	}
 }
